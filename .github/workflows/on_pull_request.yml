@@ -4,8 +4,13 @@ on:
   pull_request:
     branches:
       - main
-   # paths:
-    #  - 'images/**'
+    paths:
+      - 'images/**'
+      
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   analyze-images-beta:
