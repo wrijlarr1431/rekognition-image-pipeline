@@ -1,0 +1,51 @@
+name: Production - Image Analysis
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'images/**'
+
+jobs:
+  analyze-images-prod:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Analyze images (Production)
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE_PROD }}
+          BRANCH_NAME: main
+        run: python analyze_image.py
+      
+      - name: Create deployment summary
+        run: |
+          echo "## 🎉 Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Images have been analyzed and results stored in production DynamoDB table." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**S3 Bucket:** ${{ secrets.S3_BUCKET }}" >> $GITHUB_STEP_SUMMARY
+          echo "**DynamoDB Table:** ${{ secrets.DYNAMODB_TABLE_PROD }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** main" >> $GITHUB_STEP_SUMMARY
