@@ -1,9 +1,10 @@
 import os
 import sys
 import json
+import boto3
 from datetime import datetime
 from pathlib import Path
-import boto3
+
 
 def validate_environment():
     """Validate all required environment variables exist"""
