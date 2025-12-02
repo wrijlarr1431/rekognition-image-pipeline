@@ -7,6 +7,9 @@ on:
     paths:
       - 'images/**'
 
+permissions:
+  contents: read
+
 jobs:
   analyze-images-prod:
     runs-on: ubuntu-latest
